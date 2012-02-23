@@ -1,7 +1,7 @@
 PostProcessingNCSM
 ========
 
-v0.1 released 17-02-12
+v0.1 released 23-02-12
 
 PostProcessingNCSM is a tool to post process data generated from calculations
 at the department of Subatomic Physics, Chalmers. It is based on an existing
