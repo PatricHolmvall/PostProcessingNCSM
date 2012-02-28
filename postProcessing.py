@@ -34,6 +34,15 @@ plotStyle = [['g^-',10],
 dataFile = 'z4a10.pickle'
 printInfo = True
 drawPlot = True
+hwDependence = True
+nmaxDependence = True
+nmaxInvDependence = True
+# ['identifier', 'ytitle']
+observables = ({'id': 'e', 'drawPlot': True, 'ytitle': r'Binding energy [eV]'},
+               {'id': 'rc', 'drawPlot': True, 'ytitle': r'r$_c$ []'},
+               {'id': 'rn', 'drawPlot': True, 'ytitle': r'r$_n$ []'},
+               {'id': 'rp', 'drawPlot': True, 'ytitle': r'r$_p$ []'})
+
 
 pf = open(dataFile,'r')
 allRuns = pickle.load(pf)
@@ -73,74 +82,73 @@ figureNum = 1
 for ncsmrun in allRuns:
     ncsmRunList.append(ncsmrun)
 
-    # Make list of tuples into numpy array
-    runData = np.array(allRuns[ncsmrun]['e'])
-    
-    # Create a view of runData in order to enable sorting without changing the
-    # shape or integrity of runData. The view will be a structured array with
-    # specified labels, which is good for sorting, while runData will remain
-    # a numpy 2D ndarray which is good for plotting and doing math.
-    dt = [('hw',float), ('nmax',float), ('e',float)]
-    runDataView = runData.ravel().view(dt)
+    for observable in observables:
+        # Make list of tuples into numpy array
+        runData = np.array(allRuns[ncsmrun][observable['id']])
+
+        # Create a view of runData in order to enable sorting without changing
+        # the shape or integrity of runData. The view will be a structured array
+        # with specified labels, which is good for sorting, while runData will
+        # remain a numpy 2D ndarray which is good for plotting and doing math.
+        dt = [('hw',float), ('nmax',float), (observable['id'],float)]
+        runDataView = runData.ravel().view(dt)
 
 
-    ############################################################################
-    # Nmax dependence for different hw
-    ############################################################################
-    runDataView.sort(order='hw')
+        ########################################################################
+        # Nmax dependence for different hw
+        ########################################################################
+        runDataView.sort(order='hw')
 
-    if drawPlot:
-        pl.figure(figureNum)
-        pl.subplot(211)
-        pl.title(r'NCSM run: '+str(ncsmrun))
-        pl.xlabel(r'N$_{max}$')
-        pl.ylabel(r'Binding energy [eV]')
+        if observable['drawPlot']:
+            pl.figure(figureNum)
+            pl.subplot(211)
+            pl.title(r'NCSM run: '+str(ncsmrun))
+            pl.xlabel(r'N$_{max}$')
+            pl.ylabel(observable['ytitle'])
 
-    hwList = []
+        hwList = []
 
-    # Group data by distinct hw values
-    keynum = 0
-    for key, group in it.groupby(runData, lambda x: x[0]):
-        styleNum = keynum%len(plotStyle)
-        hwList.append(key)
-        dataSeries = np.array(list(group))
-        if drawPlot:
-            pl.plot(dataSeries[:,1],dataSeries[:,2],plotStyle[styleNum][0],
-                    markersize=plotStyle[styleNum][1],label=str(key))
-        keynum += 1
+        # Group data by distinct hw values
+        keynum = 0
+        for key, group in it.groupby(runData, lambda x: x[0]):
+            styleNum = keynum%len(plotStyle)
+            hwList.append(key)
+            dataSeries = np.array(list(group))
+            if drawPlot:
+                pl.plot(dataSeries[:,1],dataSeries[:,2],plotStyle[styleNum][0],
+                        markersize=plotStyle[styleNum][1],label=str(key))
+            keynum += 1
 
-    if drawPlot:
-        pl.legend(loc=4,title=r'$\hbar\Omega$')
-
-
-    ############################################################################
-    # hw dependence for different Nmax
-    ############################################################################
-    runDataView.sort(order='nmax')
-
-    if drawPlot:
-        pl.subplot(212)
-        pl.xlabel(r'$\hbar\Omega$ []')
-        pl.ylabel(r'Binding energy [eV]')
-
-    nmaxList = []
-
-    # Group data by distinct nmax values
-    keynum = 0
-    for key, group in it.groupby(runData, lambda x: x[1]):
-        styleNum = keynum%len(plotStyle)
-        nmaxList.append(key)
-        dataSeries = np.array(list(group))
-        if drawPlot:
-            pl.plot(dataSeries[:,0],dataSeries[:,2],plotStyle[styleNum][0],
-                    markersize=plotStyle[styleNum][1],label=str(key))
-        keynum += 1
-
-    if drawPlot:
-        pl.legend(loc=4,title=r'N$_{max}$')
+        if observable['drawPlot']:
+            pl.legend(loc=4,title=r'$\hbar\Omega$')
 
 
-    figureNum += 1
+        ########################################################################
+        # hw dependence for different Nmax
+        ########################################################################
+        runDataView.sort(order='nmax')
+
+        if observable['drawPlot']:
+            pl.subplot(212)
+            pl.xlabel(r'$\hbar\Omega$ []')
+            pl.ylabel(observable['ytitle'])
+
+        nmaxList = []
+
+        # Group data by distinct nmax values
+        keynum = 0
+        for key, group in it.groupby(runData, lambda x: x[1]):
+            styleNum = keynum%len(plotStyle)
+            nmaxList.append(key)
+            dataSeries = np.array(list(group))
+            if observable['drawPlot']:
+                pl.plot(dataSeries[:,0],dataSeries[:,2],plotStyle[styleNum][0],
+                        markersize=plotStyle[styleNum][1],label=str(key))
+            keynum += 1
+
+        if observable['drawPlot']:
+            pl.legend(loc=4,title=r'N$_{max}$')
+            figureNum += 1
 
     ############################################################################
     # Print Info
