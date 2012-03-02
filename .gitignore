@@ -1,0 +1,12 @@
+# Swap, backup files
+*~
+*.swp
+*.swx
+*.swo
+*.swn
+
+# Compiled python files
+*.pyc
+
+# Built documentation
+/doc/_built/
