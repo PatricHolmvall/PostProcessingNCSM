@@ -146,12 +146,10 @@ def postProcess(rp):
     
     # List of dictionaries containing different quantities that observables can
     # be plotted against.
-    dependenceList = [{'id': 'nmax', 'invert': False, 'group': 'hw',
-                       'groupLabel': r'$\hbar\Omega$'},
-                      {'id': 'nmax', 'invert': True, 'group': 'hw',
-                       'groupLabel': r'$\hbar\Omega$'},
-                      {'id': 'hw', 'invert': False, 'group': 'nmax',
-                       'groupLabel': r'N${_max}$'}]
+    dependenceList = [{'id': 'hw', 'gn': 1, 'group': 'nmax',
+                       'groupLabel': r'N$_{max}$'},
+                       {'id': 'nmax', 'gn': 0, 'group': 'hw',
+                        'groupLabel': r'$\hbar\Omega$'}]
 
                   
     # Unpickle
@@ -180,6 +178,11 @@ def postProcess(rp):
             # Make list of tuples into numpy array
             runData = np.array(allRuns[ncsmrun][observable['id']])
 
+            if rp.nmaxExcludeZero:
+                runData = runData[~(runData==0).any(1)]
+            
+            if observable['invert']:
+                runData = runData[~(runData==0).any(rp.xAxisVariable)]
             
             # Create a view of runData in order to enable sorting without
             # changing the shape or integrity of runData. The view will be a
@@ -191,7 +194,7 @@ def postProcess(rp):
 
             # Group the data 
             runDataView.sort(order=dependenceList[rp.xAxisVariable]['group'])
-
+            
             groupList = []
 
 
@@ -208,7 +211,7 @@ def postProcess(rp):
 
             # Group data by distinct values to create data series
             keynum = 0
-            for key, group in it.groupby(runData, lambda x: x[0]):
+            for key, group in it.groupby(runData, lambda x: x[dependenceList[rp.xAxisVariable]['gn']]):
                 styleNum = keynum%len(rp.plotStyle)
                 groupList.append(key)
                 dataSeries = np.array(list(group))

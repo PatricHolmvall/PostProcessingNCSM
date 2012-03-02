@@ -47,7 +47,7 @@ class RunParams:
                                'figure.figsize': l_figureSize},
                  printInfo=False,
                  drawPlot=False,
-                 xAxisVariable=0,
+                 xAxisVariable=1,
                  nmaxExcludeZero=False,
                  printSummary=True,
                  preformFit=True,
@@ -89,9 +89,8 @@ class RunParams:
         :param drawPlot: Enable or disable all plots.
         
         :type xAxisVariable: int
-        :param xAxisVariable: 0 - Nmax,
-                              1 - 1/Nmax,
-                              2 - hw
+        :param xAxisVariable: 0 - hw,
+                              1 - Nmax
         
         :type nmaxExcludeZero: boolean
         :param nmaxExcludeZero: Turn to True to exclude Nmax = 0 in different
