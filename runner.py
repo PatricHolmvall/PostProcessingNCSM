@@ -13,30 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with PostProcessingNCSM. If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import sys
-import csv
-import numpy as np
-from datetime import datetime
-from time import time
-
 from PostProcessingNCSM.run_params import *
 from PostProcessingNCSM.fit_functions import *
 from PostProcessingNCSM.post_processing import *
 
 
-# Journal-style specific (see the scipy/matplotlib cookbook)
-# figureWidthPt = 246.0  # Get this from LaTeX using \showthe\columnwidth
-figureWidthPt = 512.0  # Get this from LaTeX using \showthe\columnwidth
-figureFontSize = 16
-inchesPerPt = 1.0/72.27               # Convert pt to inch
-goldenMean = (np.sqrt(5)-1.0)/2.0         # Aesthetic ratio
-figureWidth = figureWidthPt*inchesPerPt  # width in inches
-figureHeight = figureWidth*goldenMean      # height in inches
-figureHeight = figureHeight + 40 * inchesPerPt # Add space for title
-figureSize =  [figureWidth,figureHeight]
+
+figureWidthPt = 512.0 # Set figure size width in pt (2 column=512, 1 column=246)
+figureFontSize = 16   # Set figure base font size in pt
+
+# Generate proper width and height for rc params (LaTeX support in figures)
+figureSize = journalStylePlot(figureWidthPt)
 
 
+# Run parameters - check the RunParams class description in the documentation
+#                  for information about the different parameters.
 rp = RunParams(dataFile = 'z4a10.pickle',
                plotStyle = [['g^-',10],
                             ['bv-',10],
@@ -47,13 +38,17 @@ rp = RunParams(dataFile = 'z4a10.pickle',
                             ['ko-',10],
                             ['wp-',10]],
                observables = [{'id': 'e', 'drawPlot': True,
+                               'preformFit': True, 'fitFunction': 'exponential',
                                'ylabel': r'Binding energy [eV]',
                                'xlabel': r'N${_max}$'},
                               {'id': 'rc', 'drawPlot': False,
+                               'preformFit': False, 'fitFunction': 'reciprocal',
                                'ylabel': r'r$_c$ []', 'xlabel': r'N${_max}$'},
                               {'id': 'rn', 'drawPlot': False,
+                               'preformFit': False, 'fitFunction': 'reciprocal',
                                'ylabel': r'r$_n$ []', 'xlabel': r'N${_max}$'},
                               {'id': 'rp', 'drawPlot': False,
+                               'preformFit': False, 'fitFunction': 'reciprocal',
                                'ylabel': r'r$_p$ []', 'xlabel': r'N${_max}$'}],
                rcUserParams = {'backend': 'ps',
                                'axes.labelsize': figureFontSize,
@@ -63,7 +58,7 @@ rp = RunParams(dataFile = 'z4a10.pickle',
                                'ytick.labelsize': 0.8*figureFontSize,
                                'text.usetex': True,
                                'figure.figsize': figureSize},
-               printInfo = False,
+               printInfo = True,
                drawPlot = True,
                xAxisVariable = 0,
                nmaxExcludeZero = False,
@@ -71,4 +66,6 @@ rp = RunParams(dataFile = 'z4a10.pickle',
                preformFit = True,
                fitFunction = 0)
 
+
+# Run the full post processing routine
 postProcess(rp)

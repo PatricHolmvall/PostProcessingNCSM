@@ -64,9 +64,9 @@ class RunParams:
         :param dataFile: Name of the data file to post process, which should
                          in turnlie in the 'runs' directory.
 
-        :type observables: tuple
-        :param observables: Tuple containing the observables to include in the
-                            post processing.
+        :type observables: list
+        :param observables: List of tuples containing the observables to include
+                            in the post processing.
 
 
 

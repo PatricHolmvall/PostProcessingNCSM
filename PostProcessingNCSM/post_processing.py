@@ -52,27 +52,32 @@ def unpickleDataFile(dataFile):
 
 
 
-def printInfo(dataFile, allRuns):
+def printInfo(dataFile, dataStructure=None):
     """
     Print info about the runs and observables measured in a NCSM run data file.
 
     :type dataFile: string
     :param dataFile: Data file containing NCSM runs.
     
-    :type allRuns: dict
-    :param allRuns: Dictionary containing the NCSM runs and all the associated
-                    data for each run. The dictionary is in a very specific
-                    format, described in the file
-                    `currentDictionaryStructure.txt`.
+    :type dataStructure: dict
+    :param dataStructure: Dictionary containing the NCSM runs and all the
+                          associated data for each run. The dictionary is in a
+                          very specific format, described in the file
+                          `currentDictionaryStructure.txt`.
     """
-    print 'Number of runs in datafile \''+str(dataFile)+'\': ',
-    print str(len(allRuns))
 
-    for ncsmrun in allRuns:
-        print '\n\n###### NCSM-Run: ' + str(ncsmrun),
-        print ' ######'
+    if dataStructure == None:
+        dataStructure = unpickleDataFile(dataFile)
+    
+    print 'Number of runs in datafile \''+str(dataFile)+'\': ',
+    print str(len(dataStructure))
+
+    for ncsmrun in dataStructure:
+        print '\n------------ NCSM-Run: ' + str(ncsmrun),
+        print ' ------------'
         print 'Fields/Observables:',
-        print '\'' + '\', \''.join(allRuns[ncsmrun]) + '\''
+        print '\'' + '\', \''.join(dataStructure[ncsmrun]) + '\''
+        print '-'*len('------------ NCSM-Run: ' + str(ncsmrun)+' ------------ ')
 
 
 
@@ -111,14 +116,17 @@ def plotObservable(dataSeries, groupBy, xLabel, yLabel, plotStyle):
 
 
 
-def preformFit(rp):
+def preformFit(observable, runData):
     """
     Preform a chi-squared fit procedure on observables in a NCSM run. The
     fitting functions are defined in the fit_functions.py file.
 
-    :type rp: :class:`run_params.RunParams` class
-    :param rp: An instance of RunParams containing which file, observables and
-               fitting function to use.
+    :type observable: tuple
+    :param observable: Tuple containing info about the observable of interest.
+
+
+    :type runData: ndarray
+    :param runData: Numpy 2D-array containing a sorted list of O(hw,Nmax).
     """
     print 'fit the function, freddy!'
 
@@ -152,16 +160,11 @@ def postProcess(rp):
 
     # Print info
     if rp.printInfo:
-        printInfo(allRuns)
+        printInfo(rp.dataFile, allRuns)
 
 
     # Set rc parameters for LaTeX support in figures
     pl.rcParams.update(rp.rcUserParams)
-
-
-    # Preform chi-squared fit procedure
-    if rp.preformFit:
-        preformFit(rp)
 
 
     ncsmRunList = []
@@ -191,6 +194,12 @@ def postProcess(rp):
 
             groupList = []
 
+
+            # Preform chi-squared fit procedure
+            if observable['preformFit']:
+                preformFit(observable, runData)
+
+        
             if observable['drawPlot']:
                 pl.figure(figureNumber)
                 pl.title(r'NCSM run: '+str(ncsmrun))
