@@ -44,7 +44,7 @@ def unpickleDataFile(dataFile):
                     format, described in the file
                     `currentDictionaryStructure.txt`.
     """
-    pf = open('runs/'+dataFile)
+    pf = open('runs/'+dataFile, 'rb')
     allRuns = pickle.load(pf)
 
     return allRuns
@@ -213,6 +213,8 @@ def postProcess(rp):
 
             # Group the data 
             runDataView.sort(order=xDict[rp.xVar]['gid'])
+
+            print runData
             
             groupList = []
 
