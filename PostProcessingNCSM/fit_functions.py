@@ -13,25 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with PostProcessingNCSM. If not, see <http://www.gnu.org/licenses/>.
 
+import numpy as np
+
 """
 Fit function description
 """
 
-#def exponentialFit(observable, Nmax, hO):
-#    """
-#    Exponential fit description goes here.
-#    :returns: Derp
-#    :rtype: Derp
-#    """
-#    return c0, c1, o_inf
+def fitFunction(func, X, Y):
+    if func == 'reciprocal':
+        def fitfunc(O_inf, p, nMax): 
+            return O_inf + p[0]/nMax + p[1] / nMax ** 2
+        return fitfunc
 
+    if func == 'exponential':
+        def fitfunc(O_inf, p, nMax):
+            return O_inf + p[0] * np.exp(-p[1] * nMax)
+        return fitfunc
 
-#def reciprocalFit(observable, Nmax, hO):
-#    """
-#    Reciprocal fit description goes here.
-#    :returns: Derp
-#    :rtype: Derp
-#    """
-#    return c0, c1, o_inf
-
+def errFunc(p, X, Y, fitFunc):
+    total = []
+    for i in range(len(X)):
+        total.append(fitFunc(p[0], p[2 * i+1:2 * i+3], X[i,:]) - Y[i,:])
+    return np.array(total).flatten().tolist()
 

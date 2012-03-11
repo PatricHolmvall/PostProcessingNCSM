@@ -20,7 +20,9 @@ import itertools as it
 from matplotlib import rc
 from matplotlib.ticker import *
 import matplotlib.pyplot as plt
-
+from scipy import optimize
+from fit_functions import fitFunction
+from fit_functions import errFunc
 
 #try:
 #    pf = open('../runs/'+rp.dataFile)
@@ -120,18 +122,39 @@ def plotObservable(dataSeries, groupBy, xLabel, yLabel, plotStyle):
 
 
 
-def performFit(observable, runData):
+def performFit(func, X, Y):
     """
-    Perform a chi-squared fit procedure on observables in a NCSM run. The
-    fitting functions are defined in the fit_functions.py file.
+Perform a chi-squared fit procedure on observables in a NCSM run. The
+fitting functions are defined in the fit_functions.py file.
 
-    :type observable: tuple
-    :param observable: Tuple containing info about the observable of interest.
+:type observable: tuple
+:param observable: Tuple containing info about the observable of interest.
 
-    :type runData: ndarray
-    :param runData: Numpy 2D-array containing a sorted list of O(hw,Nmax).
-    """
-    print 'fit the function, freddy!'
+:type runData: ndarray
+:param runData: Numpy 2D-array containing a sorted list of O(hw,Nmax).
+"""
+    #print X
+    #print Y
+    #X = X[:,1:]
+    #Y = Y[:,1:]
+
+
+    fitFunc = fitFunction(func, X, Y)
+
+
+    p = [-60]
+    for i in range(2 * len(X)):
+        p.append(1.0)
+
+
+
+    p, success = optimize.leastsq(errFunc, p, args = (X, Y, fitFunc))
+
+    #print p
+
+    for i in range(len(X)):
+        nMax_interp = np.linspace(X[i,:].min(), X[i,:].max() + 20)
+        pl.plot(nMax_interp, fitFunc(p[0], p[2 * i + 1: 2 * i + 3], nMax_interp))
 
 
 
@@ -183,12 +206,14 @@ def postProcess(rp):
             # Make list of tuples into numpy array
             runData = np.array(allRuns[ncsmrun][observable['id']])
             
+            runData = runData[runData[:,1] != 14.0]
+            
             if rp.nmaxExcludeZero:
                 runData = runData[runData[:,1] != 0]
 
             if observable['invert']:
                 runData = runData[runData[:,rp.xVar] != 0]
-            
+                
             # Create a view of runData in order to enable sorting without
             # changing the shape or integrity of runData. The view will be a
             # structured array with specified labels, which is good for sorting,
@@ -202,11 +227,6 @@ def postProcess(rp):
             
             groupList = []
 
-
-            # Perform chi-squared fit procedure
-            if observable['performFit']:
-                performFit(observable, runData)
-
         
             if observable['drawPlot']:
                 pl.figure(figureNumber)
@@ -216,11 +236,18 @@ def postProcess(rp):
 
             # Group data by distinct values to create data series
             keynum = 0
+            X = []
+            Y = []
             for key, group in it.groupby(runData,
                                          lambda x: x[xDict[rp.xVar]['gNum']]):
                 styleNum = keynum%len(rp.plotStyle)
                 groupList.append(key)
                 dataSeries = np.array(list(group))
+                #print '----------'
+                #print dataSeries[:, rp.xVar]
+                #print '----------'
+                X.append(dataSeries[:, rp.xVar])
+                Y.append(dataSeries[:, 2])
                 if observable['drawPlot']:
                     if observable['invert']:
                         pl.plot(np.reciprocal(dataSeries[:,rp.xVar].astype(np.float32)),
@@ -238,6 +265,11 @@ def postProcess(rp):
             
             if observable['drawPlot']:
                 pl.legend(loc=4, title=xDict[rp.xVar]['gLabel'])
+
+            # Perform chi-squared fit procedure
+            if observable['performFit']:
+                #print observable['fitFunction']
+                performFit(observable['fitFunction'], np.array(X), np.array(Y))
     # Show plots
     if rp.drawPlot:
         pl.show()
