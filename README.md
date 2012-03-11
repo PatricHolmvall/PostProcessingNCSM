@@ -22,7 +22,8 @@ interactions.
 System Requirements
 ----
 
-+ Python 2.6 with [numpy](http://numpy.scipy.org/).
++ Python 2.6 with [numpy](http://numpy.scipy.org/) and
+  [scipy](http://www.scipy.org/).
 + Data files from NCSM runs in a pre-determined pickled format.
 
 

@@ -35,5 +35,5 @@ Meta information
 .. toctree::
    :maxdepth: 1
 
-   Licencing <licencing.rst>
+   Licensing <licensing.rst>
    

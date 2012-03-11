@@ -31,6 +31,7 @@ import matplotlib.pyplot as plt
 
 
 
+
 def unpickleDataFile(dataFile):
     """
     Unpickle NCSM data file and return the data structure in it.
@@ -48,6 +49,7 @@ def unpickleDataFile(dataFile):
     allRuns = pickle.load(pf)
 
     return allRuns
+
 
 
 
@@ -82,6 +84,7 @@ def printInfo(dataFile, dataStructure=None):
 
 
 
+
 def journalStylePlot(figureWidthPt):
     """
     Fix figure proportions to match journal-style. Provide 
@@ -104,9 +107,10 @@ def journalStylePlot(figureWidthPt):
 
 
 
+
 def plotObservable(dataSeries, groupBy, xLabel, yLabel, plotStyle):
     """
-    Plot an observable with dependence 
+    Plot an observable 
 
     :type rp: :class:`run_params.RunParams` class
     :param rp: An instance of RunParams containing which file, observables and
@@ -128,24 +132,6 @@ def performFit(observable, runData):
     :param runData: Numpy 2D-array containing a sorted list of O(hw,Nmax).
     """
     print 'fit the function, freddy!'
-
-
-
-
-def removeRowZeros(runData, column):
-    """
-    Remove all the rows in a numpy 2D-array that contains zeros in the given
-    column.
-
-    :type runData: ndarray
-    :param rundata: Numpy 2D-array that contains an observable versus other
-                    quantities, like for example hw and nmax.
-
-    :type column: int
-    :param column: Column from which to remove rows with zeros.
-    """
-
-    return runData
 
 
 
@@ -198,10 +184,10 @@ def postProcess(rp):
             runData = np.array(allRuns[ncsmrun][observable['id']])
             
             if rp.nmaxExcludeZero:
-                runData = removeRowZeros(runData,1)
+                runData = runData[runData[:,1] != 0]
 
             if observable['invert']:
-                runData = removeRowZeros(runData,rp.xVar)
+                runData = runData[runData[:,rp.xVar] != 0]
             
             # Create a view of runData in order to enable sorting without
             # changing the shape or integrity of runData. The view will be a

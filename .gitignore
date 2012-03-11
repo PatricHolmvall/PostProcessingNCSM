@@ -9,4 +9,4 @@
 *.pyc
 
 # Built documentation
-/doc/_built/
+/doc/build/
