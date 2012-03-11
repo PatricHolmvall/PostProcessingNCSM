@@ -116,19 +116,36 @@ def plotObservable(dataSeries, groupBy, xLabel, yLabel, plotStyle):
 
 
 
-def preformFit(observable, runData):
+def performFit(observable, runData):
     """
-    Preform a chi-squared fit procedure on observables in a NCSM run. The
+    Perform a chi-squared fit procedure on observables in a NCSM run. The
     fitting functions are defined in the fit_functions.py file.
 
     :type observable: tuple
     :param observable: Tuple containing info about the observable of interest.
 
-
     :type runData: ndarray
     :param runData: Numpy 2D-array containing a sorted list of O(hw,Nmax).
     """
     print 'fit the function, freddy!'
+
+
+
+
+def removeRowZeros(runData, column):
+    """
+    Remove all the rows in a numpy 2D-array that contains zeros in the given
+    column.
+
+    :type runData: ndarray
+    :param rundata: Numpy 2D-array that contains an observable versus other
+                    quantities, like for example hw and nmax.
+
+    :type column: int
+    :param column: Column from which to remove rows with zeros.
+    """
+
+    return runData
 
 
 
@@ -145,11 +162,13 @@ def postProcess(rp):
     """
     
     # List of dictionaries containing different quantities that observables can
-    # be plotted against.
-    dependenceList = [{'id': 'hw', 'gn': 1, 'group': 'nmax',
-                       'groupLabel': r'N$_{max}$'},
-                       {'id': 'nmax', 'gn': 0, 'group': 'hw',
-                        'groupLabel': r'$\hbar\Omega$'}]
+    # be plotted against. If the user plots observables vs one quantity, the
+    # data will be grouped by another into dataseries, hence all the group
+    # parameters.
+    xDict = [{'id': 'hw', 'gNum': 1, 'gid': 'nmax',
+              'gLabel': r'N$_{max}$'},
+             {'id': 'nmax', 'gNum': 0, 'gid': 'hw',
+              'gLabel': r'$\hbar\Omega$'}]
 
                   
     # Unpickle
@@ -177,12 +196,12 @@ def postProcess(rp):
         for observable in rp.observables:
             # Make list of tuples into numpy array
             runData = np.array(allRuns[ncsmrun][observable['id']])
-
-            if rp.nmaxExcludeZero:
-                runData = runData[~(runData==0).any(1)]
             
+            if rp.nmaxExcludeZero:
+                runData = removeRowZeros(runData,1)
+
             if observable['invert']:
-                runData = runData[~(runData==0).any(rp.xAxisVariable)]
+                runData = removeRowZeros(runData,rp.xVar)
             
             # Create a view of runData in order to enable sorting without
             # changing the shape or integrity of runData. The view will be a
@@ -193,14 +212,14 @@ def postProcess(rp):
             runDataView = runData.ravel().view(dt)
 
             # Group the data 
-            runDataView.sort(order=dependenceList[rp.xAxisVariable]['group'])
+            runDataView.sort(order=xDict[rp.xVar]['gid'])
             
             groupList = []
 
 
-            # Preform chi-squared fit procedure
-            if observable['preformFit']:
-                preformFit(observable, runData)
+            # Perform chi-squared fit procedure
+            if observable['performFit']:
+                performFit(observable, runData)
 
         
             if observable['drawPlot']:
@@ -211,20 +230,29 @@ def postProcess(rp):
 
             # Group data by distinct values to create data series
             keynum = 0
-            for key, group in it.groupby(runData, lambda x: x[dependenceList[rp.xAxisVariable]['gn']]):
+            for key, group in it.groupby(runData,
+                                         lambda x: x[xDict[rp.xVar]['gNum']]):
                 styleNum = keynum%len(rp.plotStyle)
                 groupList.append(key)
                 dataSeries = np.array(list(group))
                 if observable['drawPlot']:
-                    pl.plot(dataSeries[:,1],dataSeries[:,2],
-                            rp.plotStyle[styleNum][0],
-                            markersize=rp.plotStyle[styleNum][1],label=str(key))
+                    if observable['invert']:
+                        pl.plot(np.reciprocal(dataSeries[:,rp.xVar].astype(np.float32)),
+                                dataSeries[:,2],
+                                rp.plotStyle[styleNum][0],
+                                markersize=rp.plotStyle[styleNum][1],
+                                label=str(key))
+                    else:
+                        pl.plot(dataSeries[:,rp.xVar],dataSeries[:,2],
+                                rp.plotStyle[styleNum][0],
+                                markersize=rp.plotStyle[styleNum][1],
+                                label=str(key))
                 keynum += 1
             figureNumber += 1
             
             if observable['drawPlot']:
-                pl.legend(loc=4,
-                          title=dependenceList[rp.xAxisVariable]['groupLabel'])
+                pl.legend(loc=4, title=xDict[rp.xVar]['gLabel'])
     # Show plots
     if rp.drawPlot:
         pl.show()
+

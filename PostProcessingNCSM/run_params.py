@@ -47,10 +47,10 @@ class RunParams:
                                'figure.figsize': l_figureSize},
                  printInfo=False,
                  drawPlot=False,
-                 xAxisVariable=1,
+                 xVar=1,
                  nmaxExcludeZero=False,
                  printSummary=True,
-                 preformFit=True,
+                 performFit=True,
                  fitFunction=0):
         """
         Creates an instance of a class that contains different parameters for
@@ -88,9 +88,8 @@ class RunParams:
         :type drawPlot: boolean
         :param drawPlot: Enable or disable all plots.
         
-        :type xAxisVariable: int
-        :param xAxisVariable: 0 - hw,
-                              1 - Nmax
+        :type xVar: int
+        :param xVar: 0 - hw, 1 - Nmax.
         
         :type nmaxExcludeZero: boolean
         :param nmaxExcludeZero: Turn to True to exclude Nmax = 0 in different
@@ -101,8 +100,8 @@ class RunParams:
         :type printSummary: boolean
         :param printSummary: Turn to True to display a summary/results table.
         
-        :type preformFit: boolean
-        :param preformFit: True will preform a chi-squared fit procedure.
+        :type performFit: boolean
+        :param performFit: True will perform a chi-squared fit procedure.
         
         :type fitFunction: int
         :param fitFunction: 0 - Exponential,
@@ -116,9 +115,9 @@ class RunParams:
 
         self.printInfo = printInfo
         self.drawPlot = drawPlot
-        self.xAxisVariable = xAxisVariable
+        self.xVar = xVar
         self.nmaxExcludeZero = nmaxExcludeZero
         self.printSummary = printSummary
-        self.preformFit = preformFit
+        self.performFit = performFit
         self.fitFunction = fitFunction
 
