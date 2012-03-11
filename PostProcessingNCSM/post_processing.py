@@ -20,6 +20,9 @@ import itertools as it
 from matplotlib import rc
 from matplotlib.ticker import *
 import matplotlib.pyplot as plt
+from scipy import optimize
+from fit_functions import fitFunction
+from fit_functions import errFunc
 
 
 #try:
@@ -116,7 +119,7 @@ def plotObservable(dataSeries, groupBy, xLabel, yLabel, plotStyle):
 
 
 
-def performFit(observable, runData):
+def performFit(func, X, Y):
     """
     Perform a chi-squared fit procedure on observables in a NCSM run. The
     fitting functions are defined in the fit_functions.py file.
@@ -127,7 +130,30 @@ def performFit(observable, runData):
     :type runData: ndarray
     :param runData: Numpy 2D-array containing a sorted list of O(hw,Nmax).
     """
-    print 'fit the function, freddy!'
+    #print X
+    #print Y
+    X = X[:,1:]
+    Y = Y[:,1:]
+
+
+    fitFunc = fitFunction(func, X, Y)
+
+
+    p = [-60]
+    for i in range(2 * len(X)):
+        p.append(1.0)
+
+
+
+    p, success = optimize.leastsq(errFunc, p, args = (X, Y, fitFunc))
+
+    print p
+
+    for i in range(len(X)):
+        nMax_interp = np.linspace(X[i,:].min(), X[i,:].max() + 20) 
+        pl.plot(nMax_interp, fitFunc(p[0], p[2 * i + 1: 2 * i + 3], nMax_interp))
+    
+
 
 
 
@@ -194,11 +220,12 @@ def postProcess(rp):
 
         # Loop through observables provided by the user
         for observable in rp.observables:
+            print observable
             # Make list of tuples into numpy array
             runData = np.array(allRuns[ncsmrun][observable['id']])
             
             if rp.nmaxExcludeZero:
-                runData = removeRowZeros(runData,1)
+                runData = removeRowZeros(runData, 1)
 
             if observable['invert']:
                 runData = removeRowZeros(runData,rp.xVar)
@@ -214,15 +241,9 @@ def postProcess(rp):
             # Group the data 
             runDataView.sort(order=xDict[rp.xVar]['gid'])
 
-            print runData
-            
             groupList = []
 
-
-            # Perform chi-squared fit procedure
-            if observable['performFit']:
-                performFit(observable, runData)
-
+          
         
             if observable['drawPlot']:
                 pl.figure(figureNumber)
@@ -232,11 +253,15 @@ def postProcess(rp):
 
             # Group data by distinct values to create data series
             keynum = 0
+            X = []
+            Y = []
             for key, group in it.groupby(runData,
                                          lambda x: x[xDict[rp.xVar]['gNum']]):
                 styleNum = keynum%len(rp.plotStyle)
                 groupList.append(key)
                 dataSeries = np.array(list(group))
+                X.append(dataSeries[:, rp.xVar])
+                Y.append(dataSeries[:, 2])
                 if observable['drawPlot']:
                     if observable['invert']:
                         pl.plot(np.reciprocal(dataSeries[:,rp.xVar].astype(np.float32)),
@@ -254,6 +279,12 @@ def postProcess(rp):
             
             if observable['drawPlot']:
                 pl.legend(loc=4, title=xDict[rp.xVar]['gLabel'])
+
+            # Perform chi-squared fit procedure
+            if observable['performFit']:
+                print observable['fitFunction']
+                performFit(observable['fitFunction'], np.array(X), np.array(Y))
+
     # Show plots
     if rp.drawPlot:
         pl.show()
