@@ -29,7 +29,7 @@ figureSize = applyGoldenRatio(figureWidthPt, titleSpace)
 
 # Run parameters - check the RunParams class description in the documentation
 #                  for information about the different parameters.
-rp = RunParams(dataFile = 'ncsmextract_ant_z3a6.pickle',
+rp = RunParams(dataFile = 'ncsmextract_ant_z2a4.pickle',
                plotStyle = [['g^-',10],
                             ['bv-',10],
                             ['r>-',10],
