@@ -6,7 +6,8 @@
 Welcome to PostProcessingNCSM's documentation!
 ==============================================
 
-The :py:mod:`PostProcessingNCSM` module provides post processing code blah blah.
+The :py:mod:`PostProcessingNCSM` module provides post processing data generated
+by calculations done on physical systems with the No Core Shell Model approach.
 
 Contents:
 
@@ -14,9 +15,10 @@ Contents:
    :maxdepth: 2
 
    About <about.rst>
-   Tutorial <tutorial/index.rst>
    Guide <guide/index.rst>
    Library <library/index.rst>
+   Dictionary <dictionary.rst>
+   Tasks <tasks.rst>
 
 
 
@@ -28,12 +30,3 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-
-Meta information
-================
-
-.. toctree::
-   :maxdepth: 1
-
-   Licensing <licensing.rst>
-   

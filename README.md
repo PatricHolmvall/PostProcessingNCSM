@@ -39,8 +39,8 @@ https://github.com/PatricHolmvall/PostProcessingNCSM
 Authors
 ----
 
-+ Patric Holmvall - patric.hol@gmail.com
 + Kristoffer Carlsson - kcarlsson89@gmail.com
++ Patric Holmvall - patric.hol@gmail.com
 
 
 

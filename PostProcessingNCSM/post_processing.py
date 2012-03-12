@@ -207,12 +207,12 @@ def postProcess(rp):
             runData = np.array(allRuns[ncsmrun][observable['id']])
             
             runData = runData[runData[:,1] != 14.0]
-            
-            if rp.nmaxExcludeZero:
-                runData = runData[runData[:,1] != 0]
 
+            # Remove zeros to prevent divsion by zero etc
             if observable['invert']:
                 runData = runData[runData[:,rp.xVar] != 0]
+            if rp.nmaxExcludeZero:
+                runData = runData[runData[:,1] != 0]
                 
             # Create a view of runData in order to enable sorting without
             # changing the shape or integrity of runData. The view will be a
@@ -243,9 +243,7 @@ def postProcess(rp):
                 styleNum = keynum%len(rp.plotStyle)
                 groupList.append(key)
                 dataSeries = np.array(list(group))
-                #print '----------'
-                #print dataSeries[:, rp.xVar]
-                #print '----------'
+
                 X.append(dataSeries[:, rp.xVar])
                 Y.append(dataSeries[:, 2])
                 if observable['drawPlot']:
@@ -262,14 +260,17 @@ def postProcess(rp):
                                 label=str(key))
                 keynum += 1
             figureNumber += 1
-            
+
             if observable['drawPlot']:
                 pl.legend(loc=4, title=xDict[rp.xVar]['gLabel'])
 
             # Perform chi-squared fit procedure
             if observable['performFit']:
-                #print observable['fitFunction']
                 performFit(observable['fitFunction'], np.array(X), np.array(Y))
+
+            # Print results
+            if rp.printSummary:
+                print('Summary.')
     # Show plots
     if rp.drawPlot:
         pl.show()
