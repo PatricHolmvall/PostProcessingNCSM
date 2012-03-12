@@ -24,3 +24,4 @@ FitFunctions
     :members:
     :undoc-members:
     :special-members:
+

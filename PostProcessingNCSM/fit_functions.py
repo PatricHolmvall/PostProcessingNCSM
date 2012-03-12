@@ -15,11 +15,15 @@
 
 import numpy as np
 
-"""
-Fit function description
-"""
 
-def fitFunction(func, X, Y):
+def fitFunction(func):
+    """
+    Determines what fitting function is used.
+
+    :type func: string
+    :param func: What fitting function to use. Currently 'reciprocal' and
+                 'exponential' is implemented.
+    """
     if func == 'reciprocal':
         def fitfunc(O_inf, p, nMax): 
             return O_inf + p[0]/nMax + p[1] / nMax ** 2
@@ -31,8 +35,30 @@ def fitFunction(func, X, Y):
         return fitfunc
 
 def errFunc(p, X, Y, fitFunc):
+    """
+    Returns an array of the difference between the data and the fitting
+    function for the current parameters p.
+
+    :type p: list
+    :param p: The parameters used in the fitting
+
+    :type X: list of nd arrays
+    :param X: The x-values for the runs with different hO
+
+
+    :type Y: list of nd arrays
+    :param Y: The y-values for the runs with different hO
+
+    :type fitFunc: function
+    :param fitFunc: What fitting function to use.
+
+    """
+   
+
     total = []
     for i in range(len(X)):
-        total.append(fitFunc(p[0], p[2 * i+1:2 * i+3], X[i,:]) - Y[i,:])
-    return np.array(total).flatten().tolist()
-
+        total.append(fitFunc(p[0], p[2 * i+1:2 * i+3], X[i]) - Y[i])
+    total2 = total[0]
+    for i in range(len(total) - 1):
+        total2 = np.concatenate((total2, total[i+1]))
+    return total2.tolist()

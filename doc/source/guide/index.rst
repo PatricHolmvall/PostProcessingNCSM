@@ -4,6 +4,18 @@ This guide will describe some of the functionality and how to do some basic
 post processing. Most of this is accomplished by setting the variables in the
 :py:class:`RunParams` class, in the runner.py file.
 
+Installing the package
+----------------------
+The program is hosted on github and can easily be downloaded by::
+
+   $ git clone git@github.com:PatricHolmvall/PostProcessingNCSM.git
+
+
+The program is installed by simply running setup.py with the install flag. You
+might need administrator privileges for this to work::
+
+   $ sudo python setup.py install
+   
 
 Importing data
 --------------
@@ -58,5 +70,4 @@ There are some other settings as well. More info coming soon.
 
 Performing fits
 ---------------
-Kristoffer has koll on the läge, he should totally do some marklyfts at Fysiken.
-
+More info soon.

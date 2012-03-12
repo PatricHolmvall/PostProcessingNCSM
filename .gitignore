@@ -5,6 +5,9 @@
 *.swo
 *.swn
 
+# Stackdumps generated from failed make
+*.stackdump
+
 # Compiled python files
 *.pyc
 

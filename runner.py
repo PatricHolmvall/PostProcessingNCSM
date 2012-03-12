@@ -23,7 +23,8 @@ figureWidthPt = 512.0 # Set figure size width in pt (2 column=512, 1 column=246)
 figureFontSize = 16   # Set figure base font size in pt
 
 # Generate proper width and height for rc params (LaTeX support in figures)
-figureSize = journalStylePlot(figureWidthPt)
+titleSpace = True # Enable/Disable extra space for title etc in figures
+figureSize = applyGoldenRatio(figureWidthPt, titleSpace)
 
 
 # Run parameters - check the RunParams class description in the documentation
@@ -38,7 +39,7 @@ rp = RunParams(dataFile = 'ncsmextract_ant_z3a6.pickle',
                             ['ko-',10],
                             ['wp-',10]],
                observables = [{'id': 'e', 'drawPlot': True, 'invert': False,
-                               'performFit': True, 'fitFunction': 'exponential',
+                               'performFit': True, 'fitFunction': 'reciprocal',
                                'ylabel': r'Binding energy [eV]',
                                'xlabel': r'N$_\mathrm{max}$'},
                               {'id': 'rc', 'drawPlot': False, 'invert': False,

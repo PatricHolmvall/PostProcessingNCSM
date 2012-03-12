@@ -41,11 +41,11 @@ def unpickleDataFile(dataFile):
     :type dataFile: string
     :param dataFile: Data file containing NCSM runs.
 
-    :type allRuns: dict
-    :param allRuns: Dictionary containing the NCSM runs and all the associated
-                    data for each run. The dictionary is in a very specific
-                    format, described in the file
-                    `currentDictionaryStructure.txt`.
+    :returns: AllRuns dictionary, containing the NCSM runs and all the 
+              associated data for each run. The dictionary is in a very specific
+              format, described in `the datastructure documentation
+              <../datastructure.rst>`_.
+    :rtype: Dictionary containing sorted lists.
     """
     pf = open('runs/'+dataFile)
     allRuns = pickle.load(pf)
@@ -87,24 +87,31 @@ def printInfo(dataFile, dataStructure=None):
 
 
 
-def journalStylePlot(figureWidthPt):
+def applyGoldenRatio(figureWidthPt, titleSpace=True):
     """
-    Fix figure proportions to match journal-style. Provide 
+    Get aesthetic ratio between height and width in a figure by applying the
+    golden ratio method, also adds extra space for title if titleSpace is true.
 
     :type figureWidthPt: float
     :param figureWidthPt: Figure width in pt.
 
-    :type figureSize: list
-    :param figureSize: List of floats describing width and height of figure.
+    :type titleSpace: bool
+    :param titleSpace: Enable or disable extra space for titles.
+
+    :returns: Figure width and height.
+    :rtype: List of floats.
     """
     
     inchesPerPt = 1.0/72.27 # Convert pt to inch
     goldenMean = (np.sqrt(5)-1.0)/2.0 # Aesthetic ratio
     figureWidth = figureWidthPt*inchesPerPt # width in inches
     figureHeight = figureWidth*goldenMean # height in inches
-    figureHeight = figureHeight + 40 * inchesPerPt # Add space for title
-    figureSize =  [figureWidth,figureHeight]
-    return figureSize
+    
+    # Add space for title
+    if titleSpace:
+      figureHeight = figureHeight + 40 * inchesPerPt
+    
+    return [figureWidth,figureHeight]
 
 
 
@@ -112,7 +119,7 @@ def journalStylePlot(figureWidthPt):
 
 def plotObservable(dataSeries, groupBy, xLabel, yLabel, plotStyle):
     """
-    Plot an observable 
+    Plot an observable, not yet in use.
 
     :type rp: :class:`run_params.RunParams` class
     :param rp: An instance of RunParams containing which file, observables and
@@ -124,22 +131,22 @@ def plotObservable(dataSeries, groupBy, xLabel, yLabel, plotStyle):
 
 def performFit(func, X, Y):
     """
-Perform a chi-squared fit procedure on observables in a NCSM run. The
-fitting functions are defined in the fit_functions.py file.
+    Perform a chi-squared fit procedure on observables in a NCSM run. The
+    fitting functions are defined in the fit_functions.py file.
 
-:type observable: tuple
-:param observable: Tuple containing info about the observable of interest.
+    :type func: func
+    :param func: What fitting function to use. Currently 'reciprocal' and
+                 'exponential' is implemented.
 
-:type runData: ndarray
-:param runData: Numpy 2D-array containing a sorted list of O(hw,Nmax).
-"""
-    #print X
-    #print Y
-    #X = X[:,1:]
-    #Y = Y[:,1:]
+    :type X: list of nd arrays
+    :param X: The x-values for the runs with different hO
 
 
-    fitFunc = fitFunction(func, X, Y)
+    :type Y: list of nd arrays
+    :param Y: The y-values for the runs with different hO
+    """
+
+    fitFunc = fitFunction(func)
 
 
     p = [-60]
@@ -150,10 +157,9 @@ fitting functions are defined in the fit_functions.py file.
 
     p, success = optimize.leastsq(errFunc, p, args = (X, Y, fitFunc))
 
-    #print p
 
     for i in range(len(X)):
-        nMax_interp = np.linspace(X[i,:].min(), X[i,:].max() + 20)
+        nMax_interp = np.linspace(X[i].min(), X[i].max() + 20)
         pl.plot(nMax_interp, fitFunc(p[0], p[2 * i + 1: 2 * i + 3], nMax_interp))
 
 
@@ -206,7 +212,7 @@ def postProcess(rp):
             # Make list of tuples into numpy array
             runData = np.array(allRuns[ncsmrun][observable['id']])
             
-            runData = runData[runData[:,1] != 14.0]
+            #runData = runData[runData[:,1] != 14.0]
 
             # Remove zeros to prevent divsion by zero etc
             if observable['invert']:
@@ -269,8 +275,8 @@ def postProcess(rp):
                 performFit(observable['fitFunction'], np.array(X), np.array(Y))
 
             # Print results
-            if rp.printSummary:
-                print('Summary.')
+            #if rp.printSummary:
+            #    print('Summary table goes here.')
     # Show plots
     if rp.drawPlot:
         pl.show()

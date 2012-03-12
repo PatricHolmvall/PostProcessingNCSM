@@ -12,8 +12,8 @@ many-body basis spaces. A specific aim of the NCSM campaign is to use the
 region of light nuclei as a benchmark for testing modern low-energy nuclear
 interactions. 
 
-Problem
-^^^^^^^
+Problem description
+^^^^^^^^^^^^^^^^^^^
 Observables (such as ground-state and excitation energies, electromagnetic
 moments, transition strengths, etc) are calculated using different Hamiltonians
 and for various isotopes. For each such physics case we can compute the
