@@ -3,6 +3,12 @@
 Library
 =======
 
+PostProcessing
+--------------
+.. automodule:: post_processing
+    :members:
+    :special-members:
+
 RunParams
 ---------
 .. automodule:: run_params

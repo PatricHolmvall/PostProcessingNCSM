@@ -1,14 +1,19 @@
-Dictionary
-==========
-Description of the current dictionary structure, as well as the new structure
-that is intended to be implemented soon.
+Data structure
+==============
+Description of the current data structure, as well as the new structure that is
+going to be implemented soon.
 
-Future dictionary structure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Class description
+Future data structure
+^^^^^^^^^^^^^^^^^^^^^
+The new data structure is going to be more object oriented, i.e. a class. The
+layout will be similair to a tree structure with different nodes. This class
+will also contain state-independent data, as well as state specifiers for 
+different excitation and transition properties etc.
 
-Current dictionary structure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Current data structure
+^^^^^^^^^^^^^^^^^^^^^^
+The current data structure is a dictionary with structured arrays.
+
 'allruns' dictionary structure:
       ncsmrun = gs_obs, where ncsmrun is the tuple that identifies a physics
       case  (za, int) gs_obs are the observables in a dictionary structure
